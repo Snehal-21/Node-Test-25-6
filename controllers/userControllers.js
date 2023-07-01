@@ -44,24 +44,38 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        if (!email) return res.send("Email is required.");
-        if (!password) return res.send("PAssword is required.");
+        // const { email, password } = req.body;
+        // if (!email) return res.send("Email is required.");
+        // if (!password) return res.send("PAssword is required.");
 
-        const response = await User.find({ email }).exec();
-        if (!response.length) return res.send("USer not found");
-        console.log(response);
+        // const response = await User.find({ email }).exec();
+        // if (!response.length) return res.send("USer not found");
+        // console.log(response);
 
-        const secretpass = "pin";
-        const dp = encrypt.decrypt(response[0].pin, secretpass, 256);
+        // let secretpass = "pass";
+        // const decryptPass = encrypt.decrypt(response[0].password, secretpass, 256);
+        // console.log(decryptPass);
+        // if (decryptPass == password) {
+        //     return res.send("Login Successful!");
+        // }
+        // else {
+        //     return res.send("Incorrect passord!");
+        // }
 
-        console.log(dp);
-        if (dp == password) {
-            return res.send("Login Successful!");
+        const {email, password} = req.body;
+        if(!email) return res.send("Email is required.");
+        if(!password) return res.send("Password is required.");
+
+        const user = await User.find({email}).exec();
+        if(!user.length) return res.send("User not found.");
+
+        let secretKeyPass = "pass";
+        const decryptPass = encrypt.decrypt(user[0].password, secretKeyPass, 256);
+
+        if(password !== decryptPass){
+            return res.send("Incorrect credentials.");
         }
-        else {
-            return res.send("Incorrect passord!");
-        }
+        return res.send("Logged in successfully.");
     } catch (error) {
         return res.send(error)
     }
